@@ -1,0 +1,80 @@
+---
+title: "Amazon Comprehend"
+output: html_notebook
+---
+
+Install:
+```{r}
+# latest stable version
+install.packages("aws.comprehend", repos = c(cloudyr = "http://cloudyr.github.io/drat", getOption("repos")))
+```
+
+Set up your R w/ AWS
+```{r}
+keyTable <- read.csv("accessKeys.csv", header = T) #accessKeys.csv == the CSV downloaded from AWS containing your Access & Secret keys
+AWS_ACCESS_KEY_ID <- as.character(keyTable$Access.key.ID)
+AWS_SECRET_ACCESS_KEY <- as.character(keyTable$Secret.access.key)
+
+# Activate
+Sys.setenv("AWS_ACCESS_KEY_ID" = AWS_ACCESS_KEY_ID,
+           "AWS_SECRET_ACCESS_KEY" = AWS_SECRET_ACCESS_KEY,
+           "AWS_DEFAULT_REGION" = "eu-west-1") 
+```
+
+Installing and loading:
+```{r}
+library("aws.comprehend")
+library(tidyverse)
+# Installing
+install.packages("readr")
+# Loading
+library("readr")
+```
+
+
+Importing the review & prepare for analysis:
+```{r}
+## Import data for Hotel 1
+hotel1_reviews <- unlist(read.delim('hotel1_reviews.txt'))
+
+## Import data for Hotel 2
+hotel2_reviews <- unlist(read.delim('hotel2_reviews.txt'))
+
+## Import data for Hotel 3
+hotel3_reviews <- unlist(read.delim('hotel3_reviews.txt'))
+
+## Import data for Hotel 4
+hotel4_reviews <- unlist(read.delim('hotel4_reviews.txt'))
+
+## Import data for Hotel 5
+hotel5_reviews <- unlist(read.delim('hotel5_reviews.txt'))
+
+### Highlight: You might need to detect sentiment in 5000 character chunks if your text is more than 5000 characters
+```
+
+
+Sentiment analysis:
+```{r}
+
+## Sentiment analysis for Hotel 1
+sentiment_1 <- detect_sentiment(hotel1_reviews)
+write.csv(sentiment_1, "sentiment_1.csv")
+
+
+## Sentiment analysis for Hotel 2
+sentiment_2 <- detect_sentiment(hotel2_reviews)
+write.csv(sentiment_2, "sentiment_2.csv")
+
+## Sentiment analysis for Hotel 3
+sentiment_3 <- detect_sentiment(hotel3_reviews)
+write.csv(sentiment_3, "sentiment_3.csv")
+
+## Sentiment analysis for Hotel 4
+sentiment_4 <- detect_sentiment(hotel4_reviews)
+write.csv(sentiment_4, "sentiment_4.csv")
+
+## Sentiment analysis for Hotel 5
+sentiment_5 <- detect_sentiment(hotel5_reviews)
+write.csv(sentiment_5, "sentiment_5.csv")
+```
+
