@@ -76,8 +76,8 @@ write.table(hotel5, file = "hotel5_reviews.txt", sep = "\t",
             row.names = TRUE, col.names = NA)
 
 
-## Bonus Tip
-# create a function which requires two arguments. First a keyword then a number of pages to download.
+
+## Bonus Tip: scrape many review pages by specofying the number of pages
 get_searched_pages <- function(pages_to_download) {
   
   number_of_reviews <- pages_to_download * 5
