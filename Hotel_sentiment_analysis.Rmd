@@ -1,0 +1,165 @@
+---
+title: "Sentiment Visualizations For Hotel Reviews"
+author: "Mariam Bazzi"
+date: "12/5/2020"
+output: html_document
+---
+
+
+```{r, echo=FALSE}
+
+knitr::opts_chunk$set(warning = FALSE, message = FALSE, fig.height = 10,
+                      
+                      fig.width = 10) 
+
+```
+
+
+### Loading libraries and reading the data
+
+```{r}
+
+library(tidyverse)
+
+library(scales)
+
+library(ggrepel)
+
+hotel1<-read.csv("sentiment1.csv")
+
+hotel12<- hotel1 %>% add_column(Hotel = "Hotel_1")
+
+hotel12
+
+hotel2<-read.csv("sentiment2.csv")
+
+hotel22<- hotel2 %>% add_column(Hotel = "Hotel_2")
+
+hotel22
+
+hotel3<-read.csv("sentiment3.csv")
+
+hotel32<- hotel3 %>% add_column(Hotel = "Hotel_3")
+
+hotel32
+
+
+hotel4<-read.csv("sentiment4.csv")
+
+hotel42<- hotel4 %>% add_column(Hotel = "Hotel_4")
+
+hotel42
+
+hotel5<-read.csv("sentiment5.csv")
+
+hotel52<- hotel5 %>% add_column(Hotel = "Hotel_5")
+
+hotel52
+
+hotel_all <- bind_rows(hotel12,hotel22,hotel32,hotel42,hotel52)
+
+hotel_all
+  
+  
+hotel_all2<- hotel_all %>% gather(key = "sentiment2", value = "value",
+                            
+                            c("Mixed","Negative","Neutral","Positive"))
+
+str(hotel_all2)
+
+head(hotel_all2)
+
+tail(hotel_all2)
+
+```
+
+
+#### Scatter plot
+
+```{r}
+
+# plot individual values
+
+ggplot(data = hotel_all2, 
+       
+       aes(x = X, y = value, col = sentiment2, group = sentiment2))+ 
+  
+  geom_point()+ geom_line()+ scale_color_discrete(name = "Sentiment")+
+  
+  scale_x_continuous(name = "Review")+ 
+  
+  scale_y_continuous(name = "percentage", labels = percent_format())+
+  
+  ggtitle("Sentiment distribution per review for every hotel")+
+  
+  theme(plot.title = element_text(size = 12, face = "bold", hjust = 0.5))+
+  
+  facet_wrap(~Hotel)
+
+```
+
+
+#### plot a single value for each sentiment (mean)
+
+```{r}
+
+hotel_all3 <- hotel_all2 %>% group_by(Hotel,sentiment2) %>%
+  
+  summarise(mean = mean(value))
+
+hotel_all3
+
+# coloring
+
+ggplot(data = hotel_all3, aes(x = sentiment2, y = mean, fill = sentiment2))+
+  
+  geom_col()+ xlab("Sentiment")+ 
+  
+  scale_fill_discrete("Sentiment")+
+    
+    scale_y_continuous(name = "percentage", labels = percent_format())+
+  
+  coord_flip()+
+  
+  ggtitle("Sentiments For Each Hotel")+
+  
+  theme(plot.title = element_text(size = 12, face = "bold", hjust = 0.5))+
+  
+  facet_wrap(~Hotel)
+
+
+
+ggplot(data = hotel_all3, aes(x = sentiment2, y = mean, fill = sentiment2))+
+  
+  geom_col(width = 0.5)+ xlab("Sentiment")+ 
+  
+  scale_fill_viridis_d("Sentiment", begin = 0.5)+
+    
+    scale_y_continuous(name = "percentage", labels = percent_format())+
+  
+  coord_flip()+
+  
+  ggtitle("Sentiments For Each Hotel")+
+  
+  theme(plot.title = element_text(size = 12, face = "bold", hjust = 0.5))+
+  
+  facet_wrap(~Hotel)
+
+
+ggplot(data = hotel_all3, aes(x = sentiment2, y = mean))+
+  
+  geom_col(width = 0.5, fill = "lightblue1", col = "darkblue")+
+  
+  xlab("Sentiment")+ 
+  
+    scale_y_continuous(name = "percentage", labels = percent_format())+
+  
+  coord_flip()+
+  
+  ggtitle("Sentiments For Each Hotel")+
+  
+  theme(plot.title = element_text(size = 12, face = "bold", hjust = 0.5))+
+  
+  facet_wrap(~Hotel)
+
+```
