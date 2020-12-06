@@ -1,0 +1,106 @@
+---
+title: "Web Scraping with R"
+output:
+  html_document:
+    df_print: paged
+  html_notebook: default
+---
+
+```{r}
+
+# Install packages
+install.packages("xml2", "rvest")
+# Load libraries
+library(rvest)
+library(data.table)
+
+# Install SelectorGadget on Google Chrome: https://selectorgadget.com/
+
+# Scrape the data
+get_hotel_reviews <- function(my_url){
+  print(my_url)
+  page <- read_html(my_url)
+  
+  # Get 1 review box
+  # Replace your HTML class with the one selected using Selector Gadget
+  boxes <- page %>% html_nodes('.oETBfkHU')
+  
+  x <- boxes[[1]]
+  boxes_dfs <- lapply(boxes, function(x){
+    tl <- list()
+    # Getting review data and converting it to text
+    tl[['review']] <- paste0( x %>% html_nodes('.cPQsENeY') %>% html_text(), collapse = ' ')
+
+    return(tl)
+  })
+  df <- rbindlist(boxes_dfs, fill = T)
+  return(df)
+}
+
+# Apply the function to the webpage
+# Replace the URL with the URL of the website you want to scrape
+hotel1 <- get_hotel_reviews('https://www.tripadvisor.com/Hotel_Review-g187497-d13962383-Reviews-Hotel_Barcelona_1882-Barcelona_Catalonia.html')
+
+# Save the reviews in a text file
+write.table(hotel1, file = "hotel1_reviews.txt", sep = "\t",
+            row.names = TRUE, col.names = NA)
+
+# Apply the function again for the second hotel
+hotel2 <- get_hotel_reviews('https://www.tripadvisor.com/Hotel_Review-g187497-d238730-Reviews-Hotel_Palermo-Barcelona_Catalonia.html')
+
+# Save the reviews in a text file
+write.table(hotel2, file = "hotel2_reviews.txt", sep = "\t",
+            row.names = TRUE, col.names = NA)
+
+
+# Again for the third hotel
+hotel3 <- get_hotel_reviews('https://www.tripadvisor.com/Hotel_Review-g187497-d1218860-Reviews-Hotel_Teatre_Auditori-Barcelona_Catalonia.html')
+
+# Save the reviews in a text file
+write.table(hotel3, file = "hotel3_reviews.txt", sep = "\t",
+            row.names = TRUE, col.names = NA)
+
+
+# Again for the fourth hotel
+hotel4 <- get_hotel_reviews('https://www.tripadvisor.com/Hotel_Review-g187497-d1532202-Reviews-Novotel_Barcelona_City-Barcelona_Catalonia.html')
+
+# Save the reviews in a text file
+write.table(hotel4, file = "hotel4_reviews.txt", sep = "\t",
+            row.names = TRUE, col.names = NA)
+
+# Last one
+hotel5 <- get_hotel_reviews('https://www.tripadvisor.com/Hotel_Review-g187497-d239591-Reviews-Leonardo_Hotel_Barcelona_Las_Ramblas-Barcelona_Catalonia.html')
+
+# Save the reviews in a text file
+write.table(hotel5, file = "hotel5_reviews.txt", sep = "\t",
+            row.names = TRUE, col.names = NA)
+
+
+## Bonus Tip
+# create a function which requires two arguments. First a keyword then a number of pages to download.
+get_searched_pages <- function(pages_to_download) {
+  
+  number_of_reviews <- pages_to_download * 5
+  # create links
+  if (pages_to_download == 1){
+    
+    links_to_get <- paste0('https://www.tripadvisor.com/Hotel_Review-g187497-d13962383-Reviews-Hotel_Barcelona_1882-Barcelona_Catalonia.html#REVIEWS')
+    
+  }
+  else{
+    links_to_get <- c(paste0('https://www.tripadvisor.com/Hotel_Review-g187497-d13962383-Reviews-Hotel_Barcelona_1882-Barcelona_Catalonia.html#REVIEWS'),
+                      paste0('https://www.tripadvisor.com/Hotel_Review-g187497-d13962383-Reviews-or', seq(10,number_of_reviews,5), '-Hotel_Barcelona_1882-Barcelona_Catalonia.html#REVIEWS'))
+  }
+  ret_df <- rbindlist(lapply(links_to_get, get_hotel_reviews))
+  return(ret_df)
+}
+
+# Call the function with the number of reviews' pages to scrape.
+df2 <- get_searched_pages(5)
+
+
+# Save the scraped review to a text file
+write.table(df2, file = "hotel_reviews_5_pages.txt", sep = "\t",
+            row.names = TRUE, col.names = NA)
+
+```
